@@ -1,0 +1,40 @@
+S Halep
+0.85
+5
+7
+J Larsson
+0.12
+0
+12
+R Nadal
+0.92
+10
+12
+N Djokovic
+0.90
+9
+11
+S Williams
+0.88
+15
+20
+A Kerber
+0.75
+7
+10
+R Federer
+0.91
+20
+25
+A Murray
+0.83
+8
+14
+M Sharapova
+0.78
+6
+9
+D Thiem
+0.87
+12
+16
