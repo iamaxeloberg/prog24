@@ -3,7 +3,7 @@
 # Axel Öberg
 # 20040902-4155
 # nr: 141
-# tenismatch
+# tennismatch
 
 # ******************** Användargränssnitt **********************
 
