@@ -70,8 +70,9 @@ def update_match_result(player1, player2, winner_name):
 def sort_players_by_win_percentage(players):
     return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
 
-def play_point(player1):
-    return player1 if random.random() < player1.serve_win_prob else player2
+def play_point(serving_player, receiving_player):
+    # Nu tar denna funktion båda spelarna och beräknar poängen baserat på servern.
+    return random.random() < serving_player.serve_win_prob
 
 def play_game(player1, player2):
     points = [0, 15, 30, 40]
@@ -93,7 +94,6 @@ def play_game(player1, player2):
             print(f"Game to {player2.name}")
             return player2 
         
-        # Display the points in tennis terms: 15, 30, 40
         if player1_score >= 3 and player2_score >= 3:
             if player1_score == player2_score:
                 print("Deuce")
@@ -104,9 +104,6 @@ def play_game(player1, player2):
         else:
             print(f"{points[player1_score]} - {points[player2_score]}")
 
-        # Switch server after each game
-        serving_player = player2 if serving_player == player1 else player1
-
 
 def play_set(player1, player2):
     player1.games_won = 0
@@ -115,7 +112,7 @@ def play_set(player1, player2):
 
     while True:
        print(f"\n{serving_player.name} to serve")
-       game_winner = play_game(player1, player2, serving_player)
+       game_winner = play_game(player1, player2)
 
     if game_winner == player1:
         player1.games_won += 1
@@ -132,7 +129,7 @@ def play_set(player1, player2):
         return player2
 
     #växla spelare
-    serving_player = player2 if serving_player ==1 else player1
+    serving_player = player2 if serving_player == player1 else player1
 
 def play_match(player1, player2):
     player1.sets_won = 0
