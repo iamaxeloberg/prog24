@@ -1,22 +1,7 @@
+import os
+from player import player
 
-class Player:
-    def __init__(self, name, serve_win_prob, wins, matches):
-        self.name = name
-        self.serve_win_prob = serve_win_prob
-        self.wins = wins
-        self.matches = matches
 
-    def win_percentage(self):
-        if self.matches > 0 :
-            return self.wins / self.matches
-        else:
-            return "N/A"
-        
-    def uppdated_result(self, won):
-        self.matches += 1
-        if won:
-            self.wins += 1
-    
 def read_stats_from_file(filename):
     players = []
     with open(filename, "r") as f:
@@ -63,7 +48,9 @@ def sort_players_by_win_percentage(players):
     return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
 
 def main():
-    filename = "playerdata.txt"
+
+
+    filename = "C:/Users/stadi/OneDrive/Skrivbord/github/prog24/tennisplayers.py/playerdata.txt"
 
     # read players from file
     players = read_stats_from_file(filename)
@@ -89,7 +76,7 @@ def main():
         print(f"{i+1:<10} {player.name:<20} {player.wins:<10} {player.matches:<10} {player.win_percentage():.3f}")
 
               
-    write_players_to_file(playerdata.txt, players)
+    write_players_to_file(filename, players)
 
 if __name__ == "__main__":
     main()
