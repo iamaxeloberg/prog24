@@ -8,6 +8,8 @@ class Player:
         self.serve_win_prob = serve_win_prob
         self.wins = wins
         self.matches = matches
+        self.games_won = 0 
+        self.games_lost = 0
 
     def win_percentage(self):
         if self.matches > 0 :
@@ -69,14 +71,17 @@ def sort_players_by_win_percentage(players):
     return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
 
 def play_point(player1):
-    return random.random() < serve.player1_win_prob
+    return player1 if random.random() < player1.serve_win_prob else player2
 
-def play_game(player1, player2:):
+def play_game(player1, player2):
     points = [0, 15, 30, 40]
     player1_score = 0
     player2_score = 0
+    serving_player = player1  # Start with player1 serving
+    
     while True:
-        if play_point(player1):
+        # Player wins a point based on their serve probability
+        if play_point(serving_player, player2 if serving_player == player1 else player1):
             player1_score += 1
         else:
             player2_score += 1
@@ -88,6 +93,7 @@ def play_game(player1, player2:):
             print(f"Game to {player2.name}")
             return player2 
         
+        # Display the points in tennis terms: 15, 30, 40
         if player1_score >= 3 and player2_score >= 3:
             if player1_score == player2_score:
                 print("Deuce")
@@ -98,23 +104,36 @@ def play_game(player1, player2:):
         else:
             print(f"{points[player1_score]} - {points[player2_score]}")
 
+        # Switch server after each game
+        serving_player = player2 if serving_player == player1 else player1
+
+
 def play_set(player1, player2):
     player1.games_won = 0
     player2.games_won = 0
-    while True:
-        serve, player2 = (player1, player2) if (player1.games_won + player2.games_won) % 2 == 0 else (player2, player1)
-        print(f"\n{player1-name} to serve:")
-        game_winner = player_game(player1, player2)
-        game_winner.games won += 1
-        print(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
+    serving_player = player1 if random.choice([True, False]) else player2
 
-        if player1.games_won >= 6 and player1.gameswon >= player2.games_won + 2:
-            print(f"Set to {player1.name}")
-            return player1
-        elif player2.games_won >= 6 and player2.gameswon >= player1.games_won + 2:
-            print(f"Set to {player2.name}")
-            return player2
-        
+    while True:
+       print(f"\n{serving_player.name} to serve")
+       game_winner = play_game(player1, player2, serving_player)
+
+    if game_winner == player1:
+        player1.games_won += 1
+    else: 
+        player2.games_won += 1
+
+    print(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
+
+    if player1.games_won >= 6 and player1.gameswon >= player2.games_won + 2:
+        print(f"Set to {player1.name}")
+        return player1
+    elif player2.games_won >= 6 and player2.gameswon >= player1.games_won + 2:
+        print(f"Set to {player2.name}")
+        return player2
+
+    #växla spelare
+    serving_player = player2 if serving_player ==1 else player1
+
 def play_match(player1, player2):
     player1.sets_won = 0
     player2.sets_won = 0
@@ -133,15 +152,15 @@ def main():
     players = read_stats_from_file(filename)
 
     # present players and let user choose
-    display_players(players)f
+    display_players(players)
     player1 = select_player(players, "Select player 1 by number: ")
     player2 = select_player(players, "Select player 2 by number: ")
 
-    # input winner
-    winner = input(f"Who won the match? {player1.name} or {player2.name}): ").strip()
+    play_match(player1, player2)
 
-    # uppdate playerdata
-    update_match_result(player1, player2, winner)
+    # input winner
+    winner_name = input(f"Who won the match? {player1.name} or {player2.name}): ").strip()
+    update_match_result(player1, player2, winner_name)
 
     #sort players after win percentage
     players = sort_players_by_win_percentage(players)
@@ -152,7 +171,6 @@ def main():
     for i, player in enumerate(players):
         print(f"{i+1:<10} {player.name:<20} {player.wins:<10} {player.matches:<10} {player.win_percentage():.3f}")
 
-              
     write_players_to_file(filename, players)
 
 if __name__ == "__main__":

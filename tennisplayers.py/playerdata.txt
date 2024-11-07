@@ -6,26 +6,26 @@ R Nadal
 0.92
 10
 13
-N Djokovic
-0.9
-9
-12
+D Thiem
+0.87
+13
+17
+A Kerber
+0.75
+8
+11
 S Williams
 0.88
 15
-20
-D Thiem
-0.87
-12
-16
+21
 S Halep
 0.85
 5
 7
-A Kerber
-0.75
-7
-10
+N Djokovic
+0.9
+9
+13
 M Sharapova
 0.78
 6
