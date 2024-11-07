@@ -1,6 +1,27 @@
 import os
-from player import player
+import random
+import time
 
+class Player:
+    def __init__(self, name, serve_win_prob, wins, matches):
+        self.name = name
+        self.serve_win_prob = serve_win_prob
+        self.wins = wins
+        self.matches = matches
+
+    def win_percentage(self):
+        if self.matches > 0 :
+            return self.wins / self.matches
+        else:
+            return "N/A"
+        
+    def uppdated_result(self, won):
+        self.matches += 1
+        if won:
+            self.wins += 1
+
+    def __str__(self):
+        return f"{self.name}\n{self.serve_win_prob}\n{self.wins}\n{self.matches}"
 
 def read_stats_from_file(filename):
     players = []
@@ -47,6 +68,62 @@ def update_match_result(player1, player2, winner_name):
 def sort_players_by_win_percentage(players):
     return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
 
+def play_point(player1):
+    return random.random() < serve.player1_win_prob
+
+def play_game(player1, player2:):
+    points = [0, 15, 30, 40]
+    player1_score = 0
+    player2_score = 0
+    while True:
+        if play_point(player1):
+            player1_score += 1
+        else:
+            player2_score += 1
+        
+        if player1_score >= 4 and player1_score > player2_score + 1:
+            print(f"Game to {player1.name}")
+            return player1
+        elif player2_score >= 4 and player2_score > player1_score + 1:
+            print(f"Game to {player2.name}")
+            return player2 
+        
+        if player1_score >= 3 and player2_score >= 3:
+            if player1_score == player2_score:
+                print("Deuce")
+            elif player1_score > player2_score:
+                print(f"Advantage {player1.name}")
+            else:
+                print(f"Advantage {player2.name}")
+        else:
+            print(f"{points[player1_score]} - {points[player2_score]}")
+
+def play_set(player1, player2):
+    player1.games_won = 0
+    player2.games_won = 0
+    while True:
+        serve, player2 = (player1, player2) if (player1.games_won + player2.games_won) % 2 == 0 else (player2, player1)
+        print(f"\n{player1-name} to serve:")
+        game_winner = player_game(player1, player2)
+        game_winner.games won += 1
+        print(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
+
+        if player1.games_won >= 6 and player1.gameswon >= player2.games_won + 2:
+            print(f"Set to {player1.name}")
+            return player1
+        elif player2.games_won >= 6 and player2.gameswon >= player1.games_won + 2:
+            print(f"Set to {player2.name}")
+            return player2
+        
+def play_match(player1, player2):
+    player1.sets_won = 0
+    player2.sets_won = 0
+    while player1.sets_won <2 and player2.sets_won < 2:
+        print(f"\nStarting new set: {player1.name} {player1.sets_won} - {player2.name} {player2.sets_won} ")
+        set_winner = play_set(player1, player2)
+        set_winner.sets_won += 1
+        print(f"Set score: {player1.sets_won}-{player2.sets_won} ub sets")
+
 def main():
 
 
@@ -56,7 +133,7 @@ def main():
     players = read_stats_from_file(filename)
 
     # present players and let user choose
-    display_players(players)
+    display_players(players)f
     player1 = select_player(players, "Select player 1 by number: ")
     player2 = select_player(players, "Select player 2 by number: ")
 
