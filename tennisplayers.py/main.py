@@ -19,3 +19,7 @@ class Player:
     
 def read_stats_from_file(playerdata.txt):
     with open(playerdata.txt, "r") as f:
+        players = []
+        player = playerdata.readline().strip().slit("\n")
+        for i in range(0, len(players), 4):
+            
