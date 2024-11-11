@@ -139,6 +139,10 @@ def play_match(player1, player2):
         set_winner = play_set(player1, player2)
         set_winner.sets_won += 1
         print(f"Set score: {player1.sets_won}-{player2.sets_won} ub sets")
+        time.sleep(2)  # Paus efter varje set
+    match_winner = player_a if player_a.sets_won > player_b.sets_won else player_b
+    print(f"\nMatch winner: {match_winner.name}")
+    print(f"Final score: {player_a.sets_won}-{player_b.sets_won} in sets")
 
 def main():
 
