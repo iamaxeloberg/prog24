@@ -1,7 +1,7 @@
 R Federer
 0.91
-22
-28
+23
+30
 D Thiem
 0.87
 13
@@ -37,4 +37,4 @@ A Murray
 J Larsson
 0.12
 2
-14
+16

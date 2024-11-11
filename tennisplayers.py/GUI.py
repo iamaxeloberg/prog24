@@ -1,6 +1,8 @@
 import os
 import random
 import time
+import tkinter as tk
+from tkinter import messagebox, ttk
 
 class Player:
     def __init__(self, name, serve_win_prob, wins, matches):
@@ -13,10 +15,7 @@ class Player:
         self.sets_won = 0
 
     def win_percentage(self):
-        if self.matches > 0:
-            return self.wins / self.matches
-        else:
-            return 0
+        return self.wins / self.matches if self.matches > 0 else 0
 
     def update_result(self, won):
         self.matches += 1
@@ -27,22 +26,22 @@ class Player:
         return f"{self.name}\n{self.serve_win_prob}\n{self.wins}\n{self.matches}"
 
 def read_stats_from_file(filename):
-    if not os.path.isfile(filename):
-        print("File not found!")
-        return []
-
     players = []
+    if not os.path.isfile(filename):
+        messagebox.showerror("File Error", "File not found!")
+        return players
+
     try:
         with open(filename, "r") as f:
             lines = f.readlines()
             for i in range(0, len(lines), 4):
                 name = lines[i].strip()
-                serve_win_prob = float(lines[i + 1].strip())
-                wins = int(lines[i + 2].strip())
-                matches = int(lines[i + 3].strip())
+                serve_win_prob = float(lines[i+1].strip())
+                wins = int(lines[i+2].strip())
+                matches = int(lines[i+3].strip())
                 players.append(Player(name, serve_win_prob, wins, matches))
     except Exception as e:
-        print(f"Error reading file: {e}")
+        messagebox.showerror("Error", f"Error reading file: {e}")
     return players
 
 def write_players_to_file(filename, players):
@@ -50,42 +49,16 @@ def write_players_to_file(filename, players):
         for player in players:
             f.write(str(player) + "\n")
 
-def display_players(players):
-    print("Available players:")
-    for i, player in enumerate(players):
-        print(f"{i + 1}. {player.name} - Wins: {player.wins}, Matches: {player.matches}, Win Percentage: {player.win_percentage():.3f}")
-
-def select_player(players, prompt):
-    while True:
-        try:
-            index = int(input(prompt)) - 1
-            if 0 <= index < len(players):
-                return players[index]
-            else:
-                print("Invalid selection. Try again.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-
-def update_match_result(player1, player2, winner_name):
-    if player1.name == winner_name:
-        player1.update_result(True)
-        player2.update_result(False)
-    elif player2.name == winner_name:
-        player1.update_result(False)
-        player2.update_result(True)
-
-def sort_players_by_win_percentage(players):
-    return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
-
 def play_point(serving_player):
     return random.random() < serving_player.serve_win_prob
 
-def play_game(player1, player2, serving_player):
+def play_game(player1, player2, serving_player, display_callback):
     points = [0, 15, 30, 40]
     player1_score = 0
     player2_score = 0
 
     while True:
+        # Om servande spelar vinner poängen
         if play_point(serving_player):
             if serving_player == player1:
                 player1_score += 1
@@ -97,110 +70,136 @@ def play_game(player1, player2, serving_player):
             else:
                 player1_score += 1
 
-        # Kontrollera om någon har vunnit spelet
-        if player1_score >= 4 and player1_score > player2_score + 1:
-            print(f"Game to {player1.name}")
-            return player1
-        elif player2_score >= 4 and player2_score > player1_score + 1:
-            print(f"Game to {player2.name}")
-            return player2
-
-        # Visa aktuellt poängläge och hantera "Deuce" och "Advantage"
+        # Deuce och Advantage hantering
         if player1_score >= 3 and player2_score >= 3:
             if player1_score == player2_score:
-                print("Deuce")
-            elif player1_score > player2_score:
-                print(f"Advantage {player1.name}")
-            else:
-                print(f"Advantage {player2.name}")
+                display_callback("Deuce")
+            elif player1_score == player2_score + 1:
+                display_callback(f"Advantage {player1.name}")
+            elif player2_score == player1_score + 1:
+                display_callback(f"Advantage {player2.name}")
         else:
-            print(f"{points[player1_score]} - {points[player2_score]}")
-        time.sleep(1)  # Paus efter varje poäng
+            # Poäng inom 0-40 för vardera spelare
+            score1 = points[min(player1_score, 3)]
+            score2 = points[min(player2_score, 3)]
+            display_callback(f"{score1} - {score2}")
 
-def play_set(player1, player2):
+        # Kontrollera om någon vinner spelet
+        if player1_score >= 4 and player1_score > player2_score + 1:
+            display_callback(f"Game to {player1.name}")
+            return player1
+        elif player2_score >= 4 and player2_score > player1_score + 1:      
+            display_callback(f"Game to {player2.name}")
+            return player2
+
+        time.sleep(1)  # Paus för att simulera matchens tempo
+
+def play_set(player1, player2, display_callback):
     player1.games_won = 0
     player2.games_won = 0
-    serving_player = player1 if random.choice([True, False]) else player2  # Slumpmässigt valet av första servare
+    serving_player = player1 if random.choice([True, False]) else player2
 
     while True:
-        print(f"\n{serving_player.name} to serve")
-        game_winner = play_game(player1, player2, serving_player)
+        display_callback(f"\n{serving_player.name} to serve")
+        game_winner = play_game(player1, player2, serving_player, display_callback)
 
+        # Uppdatera antalet vunna games
         if game_winner == player1:
             player1.games_won += 1
         else:
             player2.games_won += 1
 
-        print(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
+        display_callback(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
 
         # Kontrollera om någon har vunnit setet
         if player1.games_won >= 6 and player1.games_won >= player2.games_won + 2:
-            print(f"Set to {player1.name}")
+            display_callback(f"Set to {player1.name}")
             return player1
         elif player2.games_won >= 6 and player2.games_won >= player1.games_won + 2:
-            print(f"Set to {player2.name}")
+            display_callback(f"Set to {player2.name}")
             return player2
 
-        # Växla servare för nästa game
+        # Växla serverande spelare
         serving_player = player2 if serving_player == player1 else player1
 
-    while True:
-        print(f"\n{serving_player.name} to serve")
-        game_winner = play_game(player1, player2)
 
-        if game_winner == player1:
-            player1.games_won += 1
-        else:
-            player2.games_won += 1
-
-        print(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
-
-        if player1.games_won >= 6 and player1.games_won >= player2.games_won + 2:
-            print(f"Set to {player1.name}")
-            return player1
-        elif player2.games_won >= 6 and player2.games_won >= player1.games_won + 2:
-            print(f"Set to {player2.name}")
-            return player2
-
-        serving_player = player2 if serving_player == player1 else player1
-
-def play_match(player1, player2):
+def play_match(player1, player2, display_callback):
     player1.sets_won = 0
     player2.sets_won = 0
+
     while player1.sets_won < 2 and player2.sets_won < 2:
-        print(f"\nStarting new set: {player1.name} {player1.sets_won} - {player2.name} {player2.sets_won}")
-        set_winner = play_set(player1, player2)
-        set_winner.sets_won += 1
-        print(f"Set score: {player1.sets_won} - {player2.sets_won} in sets")
-        time.sleep(1)  # Pause after each set
+        display_callback(f"\nStarting new set: {player1.name} {player1.sets_won} - {player2.name} {player2.sets_won}")
+        set_winner = play_set(player1, player2, display_callback)
 
+        # Uppdatera antal vunna set
+        if set_winner == player1:
+            player1.sets_won += 1
+        else:
+            player2.sets_won += 1
+
+        display_callback(f"Set score: {player1.sets_won} - {player2.sets_won} in sets")
+        time.sleep(2)  # Paus för att simulera tid mellan set
+
+    # Vinnaren av matchen
     match_winner = player1 if player1.sets_won > player2.sets_won else player2
-    print(f"\nMatch winner: {match_winner.name}")
-    print(f"Final score: {player1.sets_won} - {player2.sets_won} in sets")
+    display_callback(f"\nMatch winner: {match_winner.name}")
+    display_callback(f"Final score: {player1.sets_won} - {player2.sets_won} in sets")
 
-def main():
-    filename = "playerdata.txt"
-    players = read_stats_from_file(filename)
-    if not players:
-        return
+    return match_winner  # Lägg till denna rad
 
-    display_players(players)
-    player1 = select_player(players, "Select player 1 by number: ")
-    player2 = select_player(players, "Select player 2 by number: ")
+class TennisApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Tennis Match Simulator")
+        self.filename = "C:/Users/stadi/OneDrive/Skrivbord/github/prog24/tennisplayers.py/playerdata.txt"
+        self.players = read_stats_from_file(self.filename)
+        self.create_widgets()
 
-    play_match(player1, player2)
+    def create_widgets(self):
+        self.player1_label = tk.Label(self.root, text="Select Player 1")
+        self.player1_label.pack()
+        
+        # Dropdowns for player selection
+        player_names = [player.name for player in self.players]  # Get player names for dropdown
+        self.player1_combo = ttk.Combobox(self.root, values=player_names)
+        self.player1_combo.pack()
 
-    winner_name = input(f"Who won the match? ({player1.name} or {player2.name}): ").strip()
-    update_match_result(player1, player2, winner_name)
+        self.player2_label = tk.Label(self.root, text="Select Player 2")
+        self.player2_label.pack()
+        self.player2_combo = ttk.Combobox(self.root, values=player_names)
+        self.player2_combo.pack()
 
-    players = sort_players_by_win_percentage(players)
+        self.start_button = tk.Button(self.root, text="Start Match", command=self.start_match)
+        self.start_button.pack()
 
-    print("\nUpdated player rankings:")
-    print(f"{'Position':<10} {'Name':<20} {'Wins':<10} {'Matches':<10} {'Win Percentage':<15}")
-    for i, player in enumerate(players):
-        print(f"{i + 1:<10} {player.name:<20} {player.wins:<10} {player.matches:<10} {player.win_percentage():.3f}")
+        self.output_text = tk.Text(self.root, height=20, width=50)
+        self.output_text.pack()
 
-    write_players_to_file(filename, players)
+    def display_callback(self, message):
+        self.output_text.insert(tk.END, message + "\n")
+        self.output_text.see(tk.END)
+        self.root.update()
+
+    def start_match(self):
+        player1_name = self.player1_combo.get()
+        player2_name = self.player2_combo.get()
+
+        if not player1_name or not player2_name or player1_name == player2_name:
+            messagebox.showerror("Selection Error", "Please select two different players.")
+            return
+
+        player1 = next(player for player in self.players if player.name == player1_name)
+        player2 = next(player for player in self.players if player.name == player2_name)
+
+        match_winner = play_match(player1, player2, self.display_callback)
+
+        player1.update_result(match_winner == player1)
+        player2.update_result(match_winner == player2)
+        write_players_to_file(self.filename, self.players)
+
+        messagebox.showinfo("Match Over", f"The winner is {match_winner.name}")
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = TennisApp(root)
+    root.mainloop()
