@@ -179,7 +179,7 @@ def play_match(player1, player2):
     print(f"Final score: {player1.sets_won} - {player2.sets_won} in sets")
 
 def main():
-    filename = "C:/Users/stadi/OneDrive/Skrivbord/github/prog24/tennisplayers.py/playerdata.txt"
+    filename = "playerdata.txt"
     players = read_stats_from_file(filename)
     if not players:
         return
