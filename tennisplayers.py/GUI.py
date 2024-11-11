@@ -147,7 +147,7 @@ def play_match(player1, player2, display_callback):
 
     return match_winner  # Lägg till denna rad
 
-class TennisApp:
+class TennisApp:    
     def __init__(self, root):
         self.root = root
         self.root.title("Tennis Match Simulator")
