@@ -1,11 +1,7 @@
 R Federer
 0.91
-21
-26
-R Nadal
-0.92
-10
-13
+22
+28
 D Thiem
 0.87
 13
@@ -14,6 +10,10 @@ A Kerber
 0.75
 8
 11
+R Nadal
+0.92
+10
+14
 S Williams
 0.88
 15
@@ -36,5 +36,5 @@ A Murray
 14
 J Larsson
 0.12
-1
-13
+2
+14
