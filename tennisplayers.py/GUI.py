@@ -9,7 +9,11 @@ class Player:
         self.name = name
         self.serve_win_prob = serve_win_prob
         self.wins = wins
-        
+        self.matches = matches
+        self.games_won = 0
+        self.games_lost = 0
+        self.sets_won = 0
+
     def win_percentage(self):
         return self.wins / self.matches if self.matches > 0 else 0
 
