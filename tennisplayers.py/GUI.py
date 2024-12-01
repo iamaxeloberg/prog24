@@ -58,7 +58,6 @@ def play_game(player1, player2, serving_player, display_callback):
     player2_score = 0
 
     while True:
-        # Om servande spelar vinner poängen
         if play_point(serving_player):
             if serving_player == player1:
                 player1_score += 1
@@ -70,7 +69,6 @@ def play_game(player1, player2, serving_player, display_callback):
             else:
                 player1_score += 1
 
-        # Deuce och Advantage hantering
         if player1_score >= 3 and player2_score >= 3:
             if player1_score == player2_score:
                 display_callback("Deuce")
@@ -79,12 +77,10 @@ def play_game(player1, player2, serving_player, display_callback):
             elif player2_score == player1_score + 1:
                 display_callback(f"Advantage {player2.name}")
         else:
-            # Poäng inom 0-40 för vardera spelare
             score1 = points[min(player1_score, 3)]
             score2 = points[min(player2_score, 3)]
             display_callback(f"{score1} - {score2}")
 
-        # Kontrollera om någon vinner spelet
         if player1_score >= 4 and player1_score > player2_score + 1:
             display_callback(f"Game to {player1.name}")
             return player1
@@ -92,7 +88,7 @@ def play_game(player1, player2, serving_player, display_callback):
             display_callback(f"Game to {player2.name}")
             return player2
 
-        time.sleep(1)  # Paus för att simulera matchens tempo
+        time.sleep(0.21)
 
 def play_set(player1, player2, display_callback):
     player1.games_won = 0
@@ -103,7 +99,6 @@ def play_set(player1, player2, display_callback):
         display_callback(f"\n{serving_player.name} to serve")
         game_winner = play_game(player1, player2, serving_player, display_callback)
 
-        # Uppdatera antalet vunna games
         if game_winner == player1:
             player1.games_won += 1
         else:
@@ -111,7 +106,6 @@ def play_set(player1, player2, display_callback):
 
         display_callback(f"Current game score: {player1.name} {player1.games_won} - {player2.name} {player2.games_won}")
 
-        # Kontrollera om någon har vunnit setet
         if player1.games_won >= 6 and player1.games_won >= player2.games_won + 2:
             display_callback(f"Set to {player1.name}")
             return player1
@@ -119,11 +113,9 @@ def play_set(player1, player2, display_callback):
             display_callback(f"Set to {player2.name}")
             return player2
 
-        # Växla serverande spelare
         serving_player = player2 if serving_player == player1 else player1
 
-
-def play_match(player1, player2, display_callback):
+def play_match(player1, player2, display_callback, stop_callback):
     player1.sets_won = 0
     player2.sets_won = 0
 
@@ -131,54 +123,70 @@ def play_match(player1, player2, display_callback):
         display_callback(f"\nStarting new set: {player1.name} {player1.sets_won} - {player2.name} {player2.sets_won}")
         set_winner = play_set(player1, player2, display_callback)
 
-        # Uppdatera antal vunna set
         if set_winner == player1:
             player1.sets_won += 1
         else:
             player2.sets_won += 1
 
         display_callback(f"Set score: {player1.sets_won} - {player2.sets_won} in sets")
-        time.sleep(2)  # Paus för att simulera tid mellan set
+        time.sleep(2)
 
-    # Vinnaren av matchen
+        if stop_callback():
+            display_callback(f"\nMatch aborted after {player1.sets_won} - {player2.sets_won} sets")
+            return None
+
     match_winner = player1 if player1.sets_won > player2.sets_won else player2
     display_callback(f"\nMatch winner: {match_winner.name}")
     display_callback(f"Final score: {player1.sets_won} - {player2.sets_won} in sets")
 
-    return match_winner  # Lägg till denna rad
+    return match_winner
 
-class TennisApp:    
+class TennisApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Tennis Match Simulator")
+        self.root.configure(bg="#0A2F14")  # Wimbledon green
         self.filename = "C:/Users/stadi/OneDrive/Skrivbord/github/prog24/tennisplayers.py/playerdata.txt"
         self.players = read_stats_from_file(self.filename)
         self.create_widgets()
+        self.match_running = False
 
     def create_widgets(self):
-        self.player1_label = tk.Label(self.root, text="Select Player 1")
-        self.player1_label.pack()
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+
+        self.style.configure('TLabel', background='#0A2F14', foreground='#FFFFFF', font=('Gotham', 12, 'bold'))
+        self.style.configure('TButton', background='#5A0D6F', foreground='#FFFFFF', font=('Gotham', 12, 'bold'))
+        self.style.map('TButton', background=[('active', '#7A2F8A')])
+
+        self.player1_label = ttk.Label(self.root, text="Select Player 1")
+        self.player1_label.pack(pady=5)
         
-        # Dropdowns for player selection
-        player_names = [player.name for player in self.players]  # Get player names for dropdown
+        player_names = [player.name for player in self.players]
         self.player1_combo = ttk.Combobox(self.root, values=player_names)
-        self.player1_combo.pack()
+        self.player1_combo.pack(pady=5)
 
-        self.player2_label = tk.Label(self.root, text="Select Player 2")
-        self.player2_label.pack()
+        self.player2_label = ttk.Label(self.root, text="Select Player 2")
+        self.player2_label.pack(pady=5)
         self.player2_combo = ttk.Combobox(self.root, values=player_names)
-        self.player2_combo.pack()
+        self.player2_combo.pack(pady=5)
 
-        self.start_button = tk.Button(self.root, text="Start Match", command=self.start_match)
-        self.start_button.pack()
+        self.start_button = ttk.Button(self.root, text="Start Match", command=self.start_match)
+        self.start_button.pack(pady=5)
+        
+        self.stop_button = ttk.Button(self.root, text="Stop Match", command=self.stop_match, state=tk.DISABLED)
+        self.stop_button.pack(pady=5)
 
-        self.output_text = tk.Text(self.root, height=20, width=50)
-        self.output_text.pack()
+        self.output_text = tk.Text(self.root, height=20, width=50, bg='#F0F0F0', font=('Gotham', 10))
+        self.output_text.pack(pady=5)
 
     def display_callback(self, message):
         self.output_text.insert(tk.END, message + "\n")
         self.output_text.see(tk.END)
         self.root.update()
+
+    def stop_callback(self):
+        return not self.match_running
 
     def start_match(self):
         player1_name = self.player1_combo.get()
@@ -191,13 +199,22 @@ class TennisApp:
         player1 = next(player for player in self.players if player.name == player1_name)
         player2 = next(player for player in self.players if player.name == player2_name)
 
-        match_winner = play_match(player1, player2, self.display_callback)
+        self.match_running = True
+        self.stop_button.config(state=tk.NORMAL)
 
-        player1.update_result(match_winner == player1)
-        player2.update_result(match_winner == player2)
-        write_players_to_file(self.filename, self.players)
+        match_winner = play_match(player1, player2, self.display_callback, self.stop_callback)
 
-        messagebox.showinfo("Match Over", f"The winner is {match_winner.name}")
+        if match_winner:
+            player1.update_result(match_winner == player1)
+            player2.update_result(match_winner == player2)
+            write_players_to_file(self.filename, self.players)
+            messagebox.showinfo("Match Over", f"The winner is {match_winner.name}")
+
+        self.match_running = False
+        self.stop_button.config(state=tk.DISABLED)
+
+    def stop_match(self):
+        self.match_running = False
 
 if __name__ == "__main__":
     root = tk.Tk()
