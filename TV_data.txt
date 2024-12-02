@@ -1,0 +1,2 @@
+Vardagsrums TV,100,22,10,9
+Köks TV,50,32,20,5
