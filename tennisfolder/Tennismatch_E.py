@@ -69,7 +69,6 @@ class Player:
             player2.update_result(True)
             player1.update_result(False)
 
-    @staticmethod
     def sort_players_by_win_percentage(players):
         return sorted(players, key=lambda p: p.win_percentage(), reverse=True)
 
