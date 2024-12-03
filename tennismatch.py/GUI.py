@@ -145,8 +145,12 @@ class TennisApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Tennis Match Simulator")
+<<<<<<< HEAD
+        self.filename = "playerdata.txt"
+=======
         self.root.configure(bg="#0A2F14")  # Wimbledon green
         self.filename = "C:/Users/stadi/OneDrive/Skrivbord/github/prog24/tennisplayers.py/playerdata.txt"
+>>>>>>> 5a8680271e0ca286171fbc0cebfc8f99a9cc7de9
         self.players = read_stats_from_file(self.filename)
         self.create_widgets()
         self.match_running = False
