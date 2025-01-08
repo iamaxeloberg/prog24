@@ -1,40 +1,10 @@
-Oberg
-0.99
-501
-502
-Thiem
-0.87
-14
-18
-Nadal
-0.92
-12
-16
-Williams
-0.88
-17
-23
-Djokovic
-0.9
-9
-14
-Borg
-0.78
-7
-11
-Halep
-0.85
-5
-8
-Kerber
-0.75
-8
-13
-Murray
-0.83
-8
-14
-Vahid
-0.12
-2
-22
+<__main__.Player object at 0x000001E3B02D2300>
+<__main__.Player object at 0x000001E3B02D2330>
+<__main__.Player object at 0x000001E3B02D2360>
+<__main__.Player object at 0x000001E3B02D2390>
+<__main__.Player object at 0x000001E3B02D23F0>
+<__main__.Player object at 0x000001E3B02D2420>
+<__main__.Player object at 0x000001E3B02D2450>
+<__main__.Player object at 0x000001E3B02D2480>
+<__main__.Player object at 0x000001E3B02D23C0>
+<__main__.Player object at 0x000001E3B02D24B0>
