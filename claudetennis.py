@@ -246,7 +246,7 @@ Score: {score.get_score_string()}
         messagebox.showinfo("Ranking", ranking_text)
 
     def run(self):
-        self.root.mainloop()
+    self.root.mainloop()
 
 # [Tidigare kod förblir densamma fram till main]
 
